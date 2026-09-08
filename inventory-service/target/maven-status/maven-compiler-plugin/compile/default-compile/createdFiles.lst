@@ -1,0 +1,7 @@
+com\example\model\Product.class
+com\example\controller\InventoryController.class
+com\example\InventoryServiceApplication.class
+com\example\service\InventoryService.class
+com\example\protocol\InventoryProtocolCheck.class
+com\example\protocol\ReservedOrdersTracker.class
+com\example\repository\ProductRepository.class

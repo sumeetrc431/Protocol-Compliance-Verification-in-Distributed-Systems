@@ -1,0 +1,4 @@
+"_time",orderId,eventType,service
+"2026-07-29T21:51:53.489+0000",9,"INVENTORY_RESERVED","order-service"
+"2026-07-29T21:51:53.443+0000",9,"ORDER_CREATED","order-service"
+"2026-07-29T21:51:54.100+0000",9,"ORDER_FAILED","order-service"

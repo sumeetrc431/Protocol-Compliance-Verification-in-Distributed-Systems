@@ -1,0 +1,32 @@
+
+[1m1. Config validation[0m
+  [32mok[0m docker-compose.yml is valid
+
+[1m2. Container status[0m
+  [32mok[0m zookeeper running
+  [32mok[0m kafka running
+  [32mok[0m splunk running
+  [32mok[0m fluentd running
+  [32mok[0m order-service running
+  [32mok[0m inventory-service running
+  [32mok[0m payment-service running
+  [32mok[0m api-gateway running
+
+[1m3. Service health endpoints[0m
+  [32mok[0m api-gateway /actuator/health -> 200
+  [32mok[0m order-service /actuator/health -> 200
+  [32mok[0m inventory-service /actuator/health -> 200
+  [32mok[0m payment-service /actuator/health -> 200
+
+[1m4. Generate traffic (so there are logs to check)[0m
+  [32mok[0m sent sample requests
+
+[1m5. Splunk HEC reachable[0m
+  [32mok[0m Splunk HEC healthy (8088)
+
+[1m6. Splunk Web reachable[0m
+  [32mok[0m Splunk Web up (8000)
+
+[1mResult[0m
+[32mAll checks passed.[0m Open http://localhost:8000 (admin / Admin1234!) and run:
+    index=main sourcetype=_json | stats count by source

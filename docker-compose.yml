@@ -1,0 +1,197 @@
+# Reusable Fluentd logging driver block. Every microservice ships its stdout
+# (JSON, produced by logback in the "docker" profile) to Fluentd, which forwards
+# to Splunk via HEC. fluentd-async keeps services starting even if Fluentd
+# isn't ready yet.
+x-logging: &fluentd-logging
+  driver: fluentd
+  options:
+    fluentd-address: "localhost:24224"
+    fluentd-async: "true"
+    tag: "{{.Name}}"
+
+services:
+
+  # ─── Infrastructure ────────────────────────────────────────────────────────
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - microservices-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - microservices-net
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  splunk:
+    image: splunk/splunk:latest
+    # Splunk publishes amd64 only; on Apple Silicon run it under emulation.
+    platform: linux/amd64
+    container_name: splunk
+    environment:
+      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_GENERAL_TERMS: "--accept-sgt-current-at-splunk-com"
+      SPLUNK_PASSWORD: "Admin1234!"
+      SPLUNK_HEC_TOKEN: "your-hec-token-here"
+      SPLUNK_HEC_ENABLE: "True"
+    ports:
+      - "8000:8000"   # Splunk Web UI
+      - "8088:8088"   # HEC endpoint
+      - "8089:8089"   # REST API (used by e2e-test.sh to verify logs)
+    volumes:
+      - splunk-data:/opt/splunk/var
+    networks:
+      - microservices-net
+    healthcheck:
+      test: ["CMD", "curl", "-sfk", "https://localhost:8088/services/collector/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+
+  # ─── Log Forwarder (Fluentd → Splunk HEC) ──────────────────────────────────
+  # Custom image with fluent-plugin-splunk-hec pre-installed.
+  fluentd:
+    build:
+      context: ./fluentd
+      dockerfile: Dockerfile
+    container_name: fluentd
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    volumes:
+      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf
+      - fluentd-buffer:/fluentd/log
+    networks:
+      - microservices-net
+    depends_on:
+      splunk:
+        condition: service_healthy
+    restart: on-failure
+
+  # ─── Microservices ─────────────────────────────────────────────────────────
+
+  order-service:
+    build:
+      context: .                        # root context so parent pom is available
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: order-service
+    container_name: order-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      fluentd:
+        condition: service_started
+    networks:
+      - microservices-net
+    logging: *fluentd-logging
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8081/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+    restart: on-failure
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: inventory-service
+    container_name: inventory-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      fluentd:
+        condition: service_started
+    networks:
+      - microservices-net
+    logging: *fluentd-logging
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8082/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+    restart: on-failure
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: payment-service
+    container_name: payment-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      fluentd:
+        condition: service_started
+    networks:
+      - microservices-net
+    logging: *fluentd-logging
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8083/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+    restart: on-failure
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      order-service:
+        condition: service_healthy
+      inventory-service:
+        condition: service_healthy
+      payment-service:
+        condition: service_healthy
+      fluentd:
+        condition: service_started
+    networks:
+      - microservices-net
+    logging: *fluentd-logging
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+    restart: on-failure
+
+# ─── Networks & Volumes ──────────────────────────────────────────────────────
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  splunk-data:
+  fluentd-buffer:

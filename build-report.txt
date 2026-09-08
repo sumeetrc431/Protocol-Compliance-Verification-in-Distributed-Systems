@@ -1,0 +1,255 @@
+ Image microservices-final-payment-service Building 
+ Image microservices-final-inventory-service Building 
+ Image microservices-final-order-service Building 
+ Image microservices-final-api-gateway Building 
+ Image microservices-final-fluentd Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 3.03kB done
+#1 DONE 0.0s
+
+#2 [fluentd internal] load build definition from Dockerfile
+#2 transferring dockerfile: 222B done
+#2 DONE 0.0s
+
+#3 [inventory-service internal] load build definition from Dockerfile
+#3 transferring dockerfile: 1.51kB done
+#3 DONE 0.0s
+
+#4 [auth] library/maven:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#5 [auth] fluent/fluentd:pull token for registry-1.docker.io
+#5 DONE 0.0s
+
+#6 [auth] library/eclipse-temurin:pull token for registry-1.docker.io
+#6 DONE 0.0s
+
+#7 [inventory-service internal] load metadata for docker.io/library/maven:3.9-eclipse-temurin-11
+#7 DONE 1.2s
+
+#8 [order-service internal] load metadata for docker.io/library/eclipse-temurin:11-jre-jammy
+#8 DONE 1.2s
+
+#9 [fluentd internal] load metadata for docker.io/fluent/fluentd:v1.16-debian-1
+#9 DONE 1.2s
+
+#10 [order-service internal] load .dockerignore
+#10 transferring context: 2B done
+#10 DONE 0.0s
+
+#11 [fluentd internal] load .dockerignore
+#11 transferring context: 2B done
+#11 DONE 0.0s
+
+#12 [inventory-service builder 1/7] FROM docker.io/library/maven:3.9-eclipse-temurin-11@sha256:1fee93ca227db7e8b8c7c72752ada0f03da6ebab40addd6fe48ac6293424186c
+#12 resolve docker.io/library/maven:3.9-eclipse-temurin-11@sha256:1fee93ca227db7e8b8c7c72752ada0f03da6ebab40addd6fe48ac6293424186c 0.0s done
+#12 DONE 0.0s
+
+#13 [order-service stage-1 1/4] FROM docker.io/library/eclipse-temurin:11-jre-jammy@sha256:76ffb747ad3a62a8b81ac3c76e2c3b1c06e475b1e10109d0a4dd604db627c9f5
+#13 resolve docker.io/library/eclipse-temurin:11-jre-jammy@sha256:76ffb747ad3a62a8b81ac3c76e2c3b1c06e475b1e10109d0a4dd604db627c9f5 0.0s done
+#13 DONE 0.0s
+
+#14 [fluentd 1/2] FROM docker.io/fluent/fluentd:v1.16-debian-1@sha256:5c63ed17a0c87a3c7c254ecdf0653b364c718bba6d33c234b3a84d235868a9ca
+#14 resolve docker.io/fluent/fluentd:v1.16-debian-1@sha256:5c63ed17a0c87a3c7c254ecdf0653b364c718bba6d33c234b3a84d235868a9ca 0.0s done
+#14 DONE 0.0s
+
+#15 [api-gateway internal] load build context
+#15 transferring context: 667B done
+#15 DONE 0.0s
+
+#16 [fluentd 2/2] RUN gem install fluent-plugin-splunk-hec --no-document
+#16 CACHED
+
+#17 [api-gateway builder 4/7] RUN sed -i '/<modules>/,/<\/modules>/d' pom.xml
+#17 CACHED
+
+#18 [api-gateway builder 6/7] COPY api-gateway/src ./api-gateway/src
+#18 CACHED
+
+#19 [api-gateway builder 5/7] COPY api-gateway/pom.xml ./api-gateway/pom.xml
+#19 CACHED
+
+#20 [api-gateway builder 7/7] RUN mvn -f api-gateway/pom.xml clean package -DskipTests -q
+#20 CACHED
+
+#21 [api-gateway builder 3/7] COPY pom.xml ./pom.xml
+#21 CACHED
+
+#22 [inventory-service internal] load build context
+#22 transferring context: 27.24kB 0.0s done
+#22 DONE 0.0s
+
+#23 [api-gateway stage-1 4/4] COPY --from=builder /app/api-gateway/target/*.jar app.jar
+#23 CACHED
+
+#24 [payment-service internal] load build context
+#24 transferring context: 15.25kB 0.0s done
+#24 DONE 0.0s
+
+#25 [order-service internal] load build context
+#25 transferring context: 43.34kB 0.0s done
+#25 DONE 0.0s
+
+#26 [inventory-service builder 6/7] COPY inventory-service/src ./inventory-service/src
+#26 CACHED
+
+#27 [inventory-service builder 7/7] RUN mvn -f inventory-service/pom.xml clean package -DskipTests -q
+#27 CACHED
+
+#28 [inventory-service builder 5/7] COPY inventory-service/pom.xml ./inventory-service/pom.xml
+#28 CACHED
+
+#29 [inventory-service builder 4/7] RUN sed -i '/<modules>/,/<\/modules>/d' pom.xml
+#29 CACHED
+
+#30 [inventory-service builder 3/7] COPY pom.xml ./pom.xml
+#30 CACHED
+
+#31 [inventory-service stage-1 4/4] COPY --from=builder /app/inventory-service/target/*.jar app.jar
+#31 CACHED
+
+#32 [order-service builder 4/7] RUN sed -i '/<modules>/,/<\/modules>/d' pom.xml
+#32 CACHED
+
+#33 [order-service builder 6/7] COPY order-service/src ./order-service/src
+#33 CACHED
+
+#34 [order-service builder 5/7] COPY order-service/pom.xml ./order-service/pom.xml
+#34 CACHED
+
+#35 [order-service builder 3/7] COPY pom.xml ./pom.xml
+#35 CACHED
+
+#36 [order-service builder 7/7] RUN mvn -f order-service/pom.xml clean package -DskipTests -q
+#36 CACHED
+
+#37 [payment-service stage-1 2/4] WORKDIR /app
+#37 CACHED
+
+#38 [payment-service builder 7/7] RUN mvn -f payment-service/pom.xml clean package -DskipTests -q
+#38 CACHED
+
+#39 [payment-service builder 2/7] WORKDIR /app
+#39 CACHED
+
+#40 [payment-service stage-1 3/4] RUN apt-get update     && apt-get install -y --no-install-recommends curl     && rm -rf /var/lib/apt/lists/*
+#40 CACHED
+
+#41 [payment-service builder 4/7] RUN sed -i '/<modules>/,/<\/modules>/d' pom.xml
+#41 CACHED
+
+#42 [payment-service builder 5/7] COPY payment-service/pom.xml ./payment-service/pom.xml
+#42 CACHED
+
+#43 [payment-service builder 3/7] COPY pom.xml ./pom.xml
+#43 CACHED
+
+#44 [payment-service builder 6/7] COPY payment-service/src ./payment-service/src
+#44 CACHED
+
+#45 [order-service stage-1 4/4] COPY --from=builder /app/order-service/target/*.jar app.jar
+#45 CACHED
+
+#46 [payment-service stage-1 4/4] COPY --from=builder /app/payment-service/target/*.jar app.jar
+#46 CACHED
+
+#47 [order-service] exporting to image
+#47 exporting layers done
+#47 exporting manifest sha256:587dceb903ce12f6752f0766c69ce84568ba8dfe42c2231a11e762f4a1b5fb3d
+#47 ...
+
+#48 [fluentd] exporting to image
+#48 exporting layers done
+#48 exporting manifest sha256:7b517b1b8aeb92c835e1c933b1c04f4557d8a00bfdf7f5478c9911d4c5866a1a done
+#48 exporting config sha256:04d944c47a6c522988509bb4f7525178f545aff57fd005c5d3888c403517e19d done
+#48 exporting attestation manifest sha256:13bbcfc4d18da746ebcadd4ab34ca3dc8531304f3608397fb0375074deec7bf9 0.0s done
+#48 exporting manifest list sha256:d0ffbe2c2fb6fde52259985c0fa394ecd82805fd0d251f2a536fe3fbee7ea171 0.0s done
+#48 naming to docker.io/library/microservices-final-fluentd:latest done
+#48 unpacking to docker.io/library/microservices-final-fluentd:latest 0.0s done
+#48 DONE 0.1s
+
+#49 [api-gateway] exporting to image
+#49 exporting layers done
+#49 exporting manifest sha256:20682e26295ceb8b883874c13831bad626faa416eb46fb7bf4ab3aaa3dd041d2 done
+#49 exporting config sha256:6fa783b485401b0be51f011ed449268d71d8c72a3faf0e2940e31509b4a3ee75 done
+#49 exporting attestation manifest sha256:741b107e9686523a3fb8b4655af0232a93566d09c84378cf8ffb3ea7bc1d575e 0.0s done
+#49 exporting manifest list sha256:752400e628f61238cd15e30f9e596032a59a1755e1d94533107778a315004f6a 0.0s done
+#49 naming to docker.io/library/microservices-final-api-gateway:latest done
+#49 unpacking to docker.io/library/microservices-final-api-gateway:latest 0.0s done
+#49 DONE 0.1s
+
+#50 [inventory-service] exporting to image
+#50 exporting layers done
+#50 exporting manifest sha256:7f5ffb0ac81d9493b0ca2ad873cf7e2a4e5eee8e0cfdd2fa698573dba26dfaed done
+#50 exporting config sha256:42d955e65b24ca27039c4117784463f755fcf5fea4fc070d817b80239aed5f68 done
+#50 exporting attestation manifest sha256:04869edb67e38d7ab507caf158546cd591fe3bf3665ec09c13fbd4113b0098c7 0.0s done
+#50 exporting manifest list sha256:2849f0c9fc371931184f351a503d54ca9fdfb5715cf9ffb4b29602c917ce336a 0.0s done
+#50 naming to docker.io/library/microservices-final-inventory-service:latest done
+#50 unpacking to docker.io/library/microservices-final-inventory-service:latest 0.0s done
+#50 DONE 0.1s
+
+#47 [order-service] exporting to image
+#47 exporting manifest sha256:587dceb903ce12f6752f0766c69ce84568ba8dfe42c2231a11e762f4a1b5fb3d done
+#47 exporting config sha256:9ef1cfa58fec7a39eeb8f6e226feda337c60c8f05962a21940d2764b2f2092be done
+#47 exporting attestation manifest sha256:c9775056946a8375ccb369db500559d4dd408d8d93f71e40252fb6c61a2bd5e6 0.0s done
+#47 exporting manifest list sha256:db5335195e8a9b256af7a04b7b08e00e30db88eec33c19eab7a8a42f2d3718da 0.0s done
+#47 naming to docker.io/library/microservices-final-order-service:latest done
+#47 unpacking to docker.io/library/microservices-final-order-service:latest 0.0s done
+#47 DONE 0.1s
+
+#51 [payment-service] exporting to image
+#51 exporting layers done
+#51 exporting manifest sha256:e52b8c4534683a15f9608452482faee7e33d0e1846ac62a38c16099c1063290f done
+#51 exporting config sha256:cb685bcabf711393d936d77757adac4c842d646c253b6fe2aeff8b3f911f1d23 done
+#51 exporting attestation manifest sha256:c1b53f3ed57d67d9d30ddd7268743fecefc2f0deaa38c2124af1a9738b210194 0.0s done
+#51 exporting manifest list sha256:808e363034e5e514bbc8da7506ec7a493bf966c41c054d029351e69d096cfa0f 0.0s done
+#51 naming to docker.io/library/microservices-final-payment-service:latest done
+#51 unpacking to docker.io/library/microservices-final-payment-service:latest 0.0s done
+#51 DONE 0.1s
+
+#52 [fluentd] resolving provenance for metadata file
+#52 DONE 0.1s
+
+#53 [inventory-service] resolving provenance for metadata file
+#53 DONE 0.1s
+
+#54 [payment-service] resolving provenance for metadata file
+#54 DONE 0.0s
+
+#55 [order-service] resolving provenance for metadata file
+#55 DONE 0.0s
+
+#56 [api-gateway] resolving provenance for metadata file
+#56 DONE 0.1s
+ Image microservices-final-payment-service Built 
+ Image microservices-final-api-gateway Built 
+ Image microservices-final-fluentd Built 
+ Image microservices-final-inventory-service Built 
+ Image microservices-final-order-service Built 
+ Image confluentinc/cp-kafka:7.4.0 Pulling 
+ Image confluentinc/cp-zookeeper:7.4.0 Pulling 
+ Image splunk/splunk:latest Pulling 
+ 4a545a007254 Pulling fs layer 0B
+ b03faae2ed2a Pulling fs layer 0B
+ 2bafef137428 Pulling fs layer 0B
+ 6aa2ad5c2509 Pulling fs layer 0B
+ 11c3fd17c9d0 Pulling fs layer 0B
+ e44bd8ab44d9 Pulling fs layer 0B
+ 012120744492 Pulling fs layer 0B
+ 71e73b8332b1 Pulling fs layer 0B
+ ee7c6c4138ac Pulling fs layer 0B
+ 734c82f14444 Pulling fs layer 0B
+ ed1166efe130 Pulling fs layer 0B
+ c6193bc97b03 Pulling fs layer 0B
+ 2bafef137428 Pulling fs layer 0B
+ ee7c6c4138ac Pulling fs layer 0B
+ b03faae2ed2a Pulling fs layer 0B
+ 734c82f14444 Pulling fs layer 0B
+ 012120744492 Pulling fs layer 0B
+ e44bd8ab44d9 Pulling fs layer 0B
+ 11c3fd17c9d0 Pulling fs layer 0B
+ 6aa2ad5c2509 Pulling fs layer 0B
+ 6f1217feaafa Pulling fs layer 0B
+ 4a545a007254 Pulling fs layer 0B
+ Image splunk/splunk:latest Error no matching manifest for linux/arm64/v8 in the manifest list entries: no match for platform in manifest: not found
+Error response from daemon: no matching manifest for linux/arm64/v8 in the manifest list entries: no match for platform in manifest: not found

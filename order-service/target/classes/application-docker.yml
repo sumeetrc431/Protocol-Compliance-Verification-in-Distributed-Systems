@@ -1,0 +1,19 @@
+# Docker profile overrides for order-service.
+# Keeps in-memory H2 (inherited from application.yml) but points inter-service
+# calls at container hostnames on the microservices-net network.
+spring:
+  # Re-enable Kafka in Docker (application.yml excludes it for local runs).
+  # OrderEventPublisher (@Profile "docker") needs a KafkaTemplate bean.
+  autoconfigure:
+    exclude: []
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+services:
+  inventory:
+    url: http://inventory-service:8082
+  payment:
+    url: http://payment-service:8083

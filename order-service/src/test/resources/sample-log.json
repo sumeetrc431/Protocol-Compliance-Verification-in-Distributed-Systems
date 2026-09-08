@@ -1,0 +1,3 @@
+{"_time":"2026-07-29T21:51:53.489+0000","orderId":"9","eventType":"INVENTORY_RESERVED","service":"order-service"}
+{"_time":"2026-07-29T21:51:53.443+0000","orderId":"9","eventType":"ORDER_CREATED","service":"order-service"}
+{"_time":"2026-07-29T21:51:54.100+0000","orderId":"9","eventType":"ORDER_FAILED","service":"order-service"}

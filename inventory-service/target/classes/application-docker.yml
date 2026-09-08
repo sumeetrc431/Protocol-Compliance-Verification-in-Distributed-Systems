@@ -1,0 +1,5 @@
+# Docker profile overrides. In-memory H2 inherited from application.yml.
+# (No inter-service dependencies for this service.)
+spring:
+  jpa:
+    show-sql: false

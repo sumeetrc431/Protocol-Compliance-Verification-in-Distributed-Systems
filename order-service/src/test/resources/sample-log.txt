@@ -1,0 +1,3 @@
+2026-07-29T21:51:53.489+0000 INFO Published Kafka event: eventType=INVENTORY_RESERVED orderId=9 service=order-service
+2026-07-29T21:51:53.443+0000 INFO Published Kafka event: eventType=ORDER_CREATED orderId=9 service=order-service
+2026-07-29T21:51:54.100+0000 INFO Published Kafka event: eventType=ORDER_FAILED orderId=9 service=order-service
